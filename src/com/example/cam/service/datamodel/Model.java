@@ -41,6 +41,8 @@ public class Model {
 	public static final String DOWNSCALE_IMG_RESP = "gallery-image-rsp";
 	public static final String RESELF_CAPTURE = "reself-capture";
 	public static final String RESELF_STREAMING = "reself-streaming";
+	public static final String RESELF_FLASH_ON = "reself-flash-on";
+	public static final String RESELF_FLASH_OFF = "reself-flash-off";
 	public static final String MSG_ID = "msgId";
 
 	 /**

@@ -130,9 +130,9 @@ public class CamTestActivity extends Activity {
                 updateCapture(intent);
             } else if (eventName.equals("streaming")){
                 updateStreaming(intent);
-            } else if (eventName.equals("reselff-flash-on")){
+            } else if (eventName.equals("flashOn")){
                 updateFlashOn(intent);
-            } else if (eventName.equals("reselff-flash-on")){
+            } else if (eventName.equals("flashOff")){
                 updateFlashOff(intent);
             }
             

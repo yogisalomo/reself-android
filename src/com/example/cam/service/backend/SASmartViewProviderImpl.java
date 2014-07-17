@@ -295,6 +295,12 @@ public class SASmartViewProviderImpl extends SAAgent {
         } else if (data.contains(Model.RESELF_STREAMING)) {
             //Nanti panggil Activity buat Ambil Foto
             sendStreaming(connectedPeerId, data);
+        } else if (data.contains(Model.RESELF_FLASH_ON)) {
+            //Nanti panggil Activity buat Ambil Foto
+            flashOn(connectedPeerId, data);
+        } else if (data.contains(Model.RESELF_FLASH_OFF)) {
+            //Nanti panggil Activity buat Ambil Foto
+            flashOff(connectedPeerId, data);
         } else {
             Log.e(TAG, "onDataAvailableonChannel: Unknown jSon PDU received");
         }
@@ -314,6 +320,22 @@ public class SASmartViewProviderImpl extends SAAgent {
         intent.putExtra("connectedPeerId", connectedPeerId);
         intent.putExtra("data", data);
         intent.putExtra("eventName", "streaming");
+        sendBroadcast(intent);
+    }
+    
+    private void flashOn(String connectedPeerId, String data) {
+        //
+        intent.putExtra("connectedPeerId", connectedPeerId);
+        intent.putExtra("data", data);
+        intent.putExtra("eventName", "flashOn");
+        sendBroadcast(intent);
+    }
+    
+    private void flashOff(String connectedPeerId, String data) {
+        //
+        intent.putExtra("connectedPeerId", connectedPeerId);
+        intent.putExtra("data", data);
+        intent.putExtra("eventName", "flashOff");
         sendBroadcast(intent);
     }
 
