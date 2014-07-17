@@ -292,6 +292,9 @@ public class SASmartViewProviderImpl extends SAAgent {
         } else if (data.contains(Model.RESELF_CAPTURE)) {
             //Nanti panggil Activity buat Ambil Foto
         	sendCapture(connectedPeerId, data);
+        } else if (data.contains(Model.RESELF_STREAMING)) {
+            //Nanti panggil Activity buat Ambil Foto
+            sendStreaming(connectedPeerId, data);
         } else {
             Log.e(TAG, "onDataAvailableonChannel: Unknown jSon PDU received");
         }
@@ -302,8 +305,17 @@ public class SASmartViewProviderImpl extends SAAgent {
     	//
         intent.putExtra("connectedPeerId", connectedPeerId);
         intent.putExtra("data", data);
+        intent.putExtra("eventName", "capture");
         sendBroadcast(intent);
 	}
+    
+    private void sendStreaming(String connectedPeerId, String data) {
+        //
+        intent.putExtra("connectedPeerId", connectedPeerId);
+        intent.putExtra("data", data);
+        intent.putExtra("eventName", "streaming");
+        sendBroadcast(intent);
+    }
 
 	/**
      * 
@@ -410,7 +422,7 @@ public class SASmartViewProviderImpl extends SAAgent {
 
         Cursor imageCursor = getContentResolver().query(
                                                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mProjection,
-                                                        null, null, null);
+                                                        null, null, MediaStore.Images.Media.DATE_ADDED +" DESC");
         if (imageCursor == null) {
             Log.e(TAG, "FAILED  to obtain cursor for Media DB");
             mReason = REASON_DATABASE_ERROR;
@@ -664,6 +676,19 @@ public class SASmartViewProviderImpl extends SAAgent {
 
             try {
                 uHandler.send(GALLERY_CHANNEL_ID, uJsonStringToSend.getBytes());
+            } catch (final IOException e) {
+                Log.e(TAG, "I/O Error occured while send");
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void sendResponseImg(String connectedPeerId, byte[] data) {
+        if (mConnectionsMap != null) {
+            final SAGalleryProviderConnection uHandler = mConnectionsMap
+                                                                        .get(Integer.parseInt(connectedPeerId));
+            try {
+                uHandler.send(GALLERY_CHANNEL_ID, data);
             } catch (final IOException e) {
                 Log.e(TAG, "I/O Error occured while send");
                 e.printStackTrace();
