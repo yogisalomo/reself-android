@@ -45,6 +45,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -366,22 +367,52 @@ public class SASmartViewProviderImpl extends SAAgent {
         final long img_id = imageCursor.getLong(imageCursor
                                                            .getColumnIndex(MediaStore.Images.Media._ID));
         Log.d(TAG, "image id = " + img_id);
-        final Bitmap bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), img_id);
-        if (bm == null) {
-            Log.e(TAG, "Failed to get bitmap thumbnail id: " + img_id);
-            return false;
+        String[] fileColumn = { MediaStore.Images.Media.DATA };
+        int fileColumnIndex = imageCursor.getColumnIndex(fileColumn[0]);
+        String picturePath = imageCursor.getString(fileColumnIndex);
+        Log.d(TAG, "picturePath: "+picturePath);
+        
+        final BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inScaled = false;
+        opt.inSampleSize = 2; // logic based on original and requested size.
+        final Bitmap scaledbitmap = Bitmap.createScaledBitmap(
+                                                              BitmapFactory.decodeFile(picturePath, opt), 320, 320, false);
+        if (scaledbitmap != null) {
+            Log.d(TAG, "scaled  bitmap  from  factory size is = "
+                    + scaledbitmap.getByteCount());
+            Log.d(TAG, "Bitmap bm size = " + scaledbitmap.getByteCount());
+            final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            scaledbitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+            Log.d(TAG, "compressed JPEG stream size  = " + stream.size());
+            data = Base64.encodeToString(stream.toByteArray(),Base64.NO_WRAP);
+            try {
+                stream.close();
+            } catch (final IOException e) {
+                Log.e(TAG, "sendDownscaledImage() cannot  close stream");
+                e.printStackTrace();
+            }
         }
-        Log.d(TAG, "Bitmap bm size = " + bm.getByteCount());
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 80, stream);
-        Log.d(TAG, "compressed stream size  = " + stream.size());
-        data = Base64.encodeToString(stream.toByteArray(),Base64.NO_WRAP);
-        try {
-            stream.close();
-        } catch (final IOException e) {
-            Log.e(TAG,"sendThumbnails() Cannot close byte array stream");
-            e.printStackTrace();
-        }
+//        final Bitmap bm = BitmapFactory.decodeFile(picturePath);
+//        final Bitmap bm = new Bitmap;
+//        final Bitmap bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), new Uri(picturePath));
+//        final Bitmap bm = MediaStore.Images.Thumbnails.getThumbnail(
+//                getApplicationContext().getContentResolver(), img_id,
+//                MediaStore.Images.Thumbnails.MICRO_KIND, null);
+//        if (bm == null) {
+//            Log.e(TAG, "Failed to get bitmap thumbnail id: " + img_id);
+//            return false;
+//        }
+//        Log.d(TAG, "Bitmap bm size = " + bm.getByteCount());
+//        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bm.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+//        Log.d(TAG, "compressed stream size  = " + stream.size());
+//        data = Base64.encodeToString(stream.toByteArray(),Base64.NO_WRAP);
+//        try {
+//            stream.close();
+//        } catch (final IOException e) {
+//            Log.e(TAG,"sendThumbnails() Cannot close byte array stream");
+//            e.printStackTrace();
+//        }
     
         Log.d(TAG, "image data base 64 length = " + data.length());
 
