@@ -366,9 +366,7 @@ public class SASmartViewProviderImpl extends SAAgent {
         final long img_id = imageCursor.getLong(imageCursor
                                                            .getColumnIndex(MediaStore.Images.Media._ID));
         Log.d(TAG, "image id = " + img_id);
-        final Bitmap bm = MediaStore.Images.Thumbnails.getThumbnail(
-                                                                    getApplicationContext().getContentResolver(), img_id,
-                                                                    MediaStore.Images.Thumbnails.MICRO_KIND, null);
+        final Bitmap bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), img_id);
         if (bm == null) {
             Log.e(TAG, "Failed to get bitmap thumbnail id: " + img_id);
             return false;
