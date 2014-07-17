@@ -47,7 +47,7 @@ public class CamTestActivity extends Activity {
 		
 		preview = new Preview(this, (SurfaceView)findViewById(R.id.surfaceView));
 		preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		((FrameLayout) findViewById(R.id.preview)).addView(preview);
+		((FrameLayout) findViewById(R.id.camera_preview)).addView(preview);
 		preview.setKeepScreenOn(true);
 		
 		buttonClick = (Button) findViewById(R.id.buttonClick);
