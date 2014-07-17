@@ -706,6 +706,7 @@ public class SASmartViewProviderImpl extends SAAgent {
      */
     public void sendImgRsp(String connectedPeerId, long id, String orgName, long orgSize, int orgWidth, int orgHeight) {
 
+    	//Log.e("BOO","SendImgRSP-1");
         Log.d(TAG, "sendImgRsp : enter");
         final TBModelJson msg = new TBModelJson(id, orgName, mImgData, orgSize, orgWidth,
                                                 orgHeight);
@@ -718,16 +719,18 @@ public class SASmartViewProviderImpl extends SAAgent {
             Log.e(TAG, "sendDownscaledImage() Cannot Convert json to string");
             e.printStackTrace();
         }
-
+        //Log.e("BOO","SendImgRSP-2");
         Log.d(TAG, "downscaled img rsp  size = " + uJsonStringToSend.length());
         if (mConnectionsMap != null) {
-            final SAGalleryProviderConnection uHandler = mConnectionsMap
-                                                                        .get(Integer.parseInt(connectedPeerId));
-
+            
+            //Log.e("BOO","SendImgRSP-3");
             try {
+            	final SAGalleryProviderConnection uHandler = mConnectionsMap
+                        .get(Integer.parseInt(connectedPeerId));
                 uHandler.send(GALLERY_CHANNEL_ID, uJsonStringToSend.getBytes());
-            } catch (final IOException e) {
-                Log.e(TAG, "I/O Error occured while send");
+                Log.e(TAG, "No Error " + connectedPeerId);
+            } catch (final Exception e) {
+                Log.e(TAG, "Fuckin Error " + connectedPeerId);
                 e.printStackTrace();
             }
         }
