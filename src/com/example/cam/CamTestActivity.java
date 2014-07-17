@@ -1,14 +1,13 @@
 package com.example.cam;
 
-/**
- * @author Jose Davis Nidhin
- */
 
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import com.example.cam.service.backend.SASmartViewProviderImpl;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -20,6 +19,8 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -30,6 +31,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+
+import com.example.cam.service.backend.SASmartViewProviderImpl;
 
 public class CamTestActivity extends Activity {
 	private static final String TAG = "CamTestActivity";
@@ -129,20 +132,30 @@ public class CamTestActivity extends Activity {
 	PictureCallback rawCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera camera) {
 			// Log.d(TAG, "onPictureTaken - raw");
+			System.out.println("Masuk raw");
 		}
 	};
 
 	PictureCallback jpegCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera camera) {
+			Log.d(TAG,"Masuk jpeg");
 			FileOutputStream outStream = null;
 			try {
 				// Write to SD Card
-				fileName = String.format("/sdcard/camtest/%d.jpg", System.currentTimeMillis());
+				File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "reself");
+		    	if(!mediaStorageDir.exists()){
+		    		if(!mediaStorageDir.mkdirs()){
+		    			return;
+		    		}
+		    	}
+		    	String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+				fileName = mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg";
+				Log.d(TAG,fileName);
 				outStream = new FileOutputStream(fileName);
 				outStream.write(data);
 				outStream.close();
 				Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length);
-
+				MediaStore.Images.Media.insertImage(getContentResolver(), fileName, "IMG_"+ timeStamp + ".jpg", "");
 				resetCam();
 
 			} catch (FileNotFoundException e) {
