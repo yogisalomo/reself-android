@@ -583,6 +583,36 @@ public class SASmartViewProviderImpl extends SAAgent {
         mResult = "success"; // success
         mReason = REASON_OK; // ok
     }
+    
+    public void pullDownPrevImage(byte[] frame, int width, int height){
+    	final BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inScaled = false;
+        opt.inSampleSize = 4; // logic based on original and requested size.
+        
+        final Bitmap scaledbitmap = BitmapFactory.decodeByteArray(frame, 0, frame.length);
+        if (scaledbitmap != null) {
+            Log.d(TAG, "scaled  bitmap  from  factory size is = "
+                    + scaledbitmap.getByteCount());
+            Log.d(TAG, "Bitmap bm size = " + scaledbitmap.getByteCount());
+            final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            scaledbitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+            Log.d(TAG, "compressed JPEG stream size  = " + stream.size());
+            mImgData = Base64.encodeToString(stream.toByteArray(),Base64.NO_WRAP);
+            try {
+                stream.close();
+            } catch (final IOException e) {
+                Log.e(TAG, "sendDownscaledImage() cannot  close stream");
+                e.printStackTrace();
+            }
+            Log.d("test","not null");
+        }
+        else {
+        	Log.d("test","null");
+        }
+        Log.d(TAG, " BASE 64 encoded size length = " + mImgData.length());
+        mResult = "success"; // success
+        mReason = REASON_OK; // ok
+    }
 
     /**
      * 

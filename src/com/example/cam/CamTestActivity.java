@@ -2,6 +2,8 @@ package com.example.cam;
 
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +34,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
@@ -169,7 +174,7 @@ public class CamTestActivity extends Activity {
 		super.onResume();
 		//      preview.camera = Camera.open();
 		camera = Camera.open();
-//		setupCamera(preview_cb);
+		setupCamera(preview_cb);
 		camera.startPreview();
 		preview.setCamera(camera);
 		startService(intent);
@@ -178,14 +183,29 @@ public class CamTestActivity extends Activity {
 	
 	 private PreviewCallback preview_cb = new PreviewCallback() {
         public void onPreviewFrame(byte[] frame, Camera c) {
+        	//Log.d("test","hello");
             if ( !inProcessing ) {
                 inProcessing = true;
-           
+                
                 int picWidth = 320;
                 int picHeight = 320; 
                 ByteBuffer bbuffer = ByteBuffer.wrap(frame); 
                 bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
-
+                //Log.d("test","hello");
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                // Send to Gear
+                Camera.Parameters parameters = camera.getParameters();
+                int width = parameters.getPreviewSize().width;
+                int height = parameters.getPreviewSize().height;
+                YuvImage image = new YuvImage(frame, parameters.getPreviewFormat(),
+                		width, height, null);
+                ByteArrayOutputStream oS = new ByteArrayOutputStream();
+                image.compressToJpeg(
+                        new Rect(0, 0, 320, 320), 90,
+                        		oS);
+                byte[] imgframebyte = oS.toByteArray();
+                SASmartViewProviderImpl.getInstance().pullDownPrevImage(imgframebyte, 320, 320);
+				//SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 1, "prev_"+ timeStamp + ".jpg", frame.length, 320, 320);
                 inProcessing = false;
             }
         }
@@ -193,7 +213,7 @@ public class CamTestActivity extends Activity {
 
 	private void setupCamera(PreviewCallback cb) {
 	    Camera.Parameters p = camera.getParameters();        
-        p.setPreviewSize(320, 320);
+        //p.setPreviewSize(320, 320);
         camera.setParameters(p);
         camera.setPreviewCallback(cb);
     }
