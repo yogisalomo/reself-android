@@ -39,6 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|center_horizontal"
+                android:paddingTop="277dp"
                 android:text="Tap your gear to take a picture"
                 android:textAlignment="center"
                 android:textSize="25dp"
