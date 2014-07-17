@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,9 +16,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,6 +51,9 @@ public class CamTestActivity extends Activity {
 	private Intent intent;
 	private String connectedPeerId;
 	private String data;
+	private String eventName;
+	boolean inProcessing = false;
+	byte[] preFrame = new byte[1024*1024*8];
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -90,7 +99,12 @@ public class CamTestActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             connectedPeerId = intent.getStringExtra("connectedPeerId");
             data = intent.getStringExtra("data");
-        	updateCapture(intent);
+            eventName = intent.getStringExtra("eventName");
+            if (eventName.equals("capture")) {
+                updateCapture(intent);
+            } else if (eventName.equals("streaming")){
+                updateStreaming(intent);
+            }
             
         }
     };   
@@ -98,20 +112,49 @@ public class CamTestActivity extends Activity {
     private void updateCapture(Intent intent) {
         camera.takePicture(shutterCallback, rawCallback, jpegCallback);
     }
+    
+    private void updateStreaming(Intent intent) {
+        YuvImage newImage = new YuvImage(preFrame, ImageFormat.JPEG, 320, 320, null);
+        SASmartViewProviderImpl.getInstance().sendResponseImg(connectedPeerId, newImage.getYuvData());
+    }
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		//      preview.camera = Camera.open();
 		camera = Camera.open();
+//		setupCamera(preview_cb);
 		camera.startPreview();
 		preview.setCamera(camera);
 		startService(intent);
 		registerReceiver(broadcastReceiver, new IntentFilter(SASmartViewProviderImpl.BROADCAST_ACTION));
 	}
+	
+	 private PreviewCallback preview_cb = new PreviewCallback() {
+        public void onPreviewFrame(byte[] frame, Camera c) {
+            if ( !inProcessing ) {
+                inProcessing = true;
+           
+                int picWidth = 320;
+                int picHeight = 320; 
+                ByteBuffer bbuffer = ByteBuffer.wrap(frame); 
+                bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
 
-	@Override
+                inProcessing = false;
+            }
+        }
+    };
+
+	private void setupCamera(PreviewCallback cb) {
+	    Camera.Parameters p = camera.getParameters();        
+        p.setPreviewSize(320, 320);
+        camera.setParameters(p);
+        camera.setPreviewCallback(cb);
+    }
+
+    @Override
 	protected void onPause() {
+        inProcessing = true;
 		if(camera != null) {
 			camera.stopPreview();
 			preview.setCamera(null);
@@ -124,6 +167,7 @@ public class CamTestActivity extends Activity {
 	}
 
 	private void resetCam() {
+//	    setupCamera(preview_cb);
 		camera.startPreview();
 		preview.setCamera(camera);
 	}
@@ -163,7 +207,7 @@ public class CamTestActivity extends Activity {
 				MediaStore.Images.Media.insertImage(getContentResolver(), fileName, "IMG_"+ timeStamp + ".jpg", "");
 				//Sending to Gear
 				SASmartViewProviderImpl.getInstance().pullDownscaledImg(fileName, 320, 320);
-				SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 123, "IMG_"+ timeStamp + ".jpg", data.length, 320, 320);
+				SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 1, "IMG_"+ timeStamp + ".jpg", data.length, 320, 320);
 				
 				resetCam();
 
