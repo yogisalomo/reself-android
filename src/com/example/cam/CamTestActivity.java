@@ -205,7 +205,7 @@ public class CamTestActivity extends Activity {
                         		oS);
                 byte[] imgframebyte = oS.toByteArray();
                 SASmartViewProviderImpl.getInstance().pullDownPrevImage(imgframebyte, 320, 320);
-				//SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 1, "prev_"+ timeStamp + ".jpg", frame.length, 320, 320);
+				SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 1, "prev_"+ timeStamp + ".jpg", frame.length, 320, 320);
                 inProcessing = false;
             }
         }
