@@ -40,6 +40,7 @@ public class Model {
 	public static final String DOWNSCALE_IMG_RQST = "gallery-image-req";
 	public static final String DOWNSCALE_IMG_RESP = "gallery-image-rsp";
 	public static final String RESELF_CAPTURE = "reself-capture";
+	public static final String RESELF_STREAMING = "reself-streaming";
 	public static final String MSG_ID = "msgId";
 
 	 /**
