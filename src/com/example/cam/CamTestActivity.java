@@ -127,6 +127,10 @@ public class CamTestActivity extends Activity {
                 updateCapture(intent);
             } else if (eventName.equals("streaming")){
                 updateStreaming(intent);
+            } else if (eventName.equals("reselff-flash-on")){
+                updateFlashOn(intent);
+            } else if (eventName.equals("reselff-flash-on")){
+                updateFlashOff(intent);
             }
             
         }
@@ -134,6 +138,22 @@ public class CamTestActivity extends Activity {
     
     private void updateCapture(Intent intent) {
         camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+    }
+    
+    private void updateFlashOn(Intent intent) {
+    	final Parameters p = camera.getParameters();
+    	Log.d(TAG,"Turning On the Flash");
+		p.setFlashMode(Parameters.FLASH_MODE_ON);
+		camera.setParameters(p);
+		isFlashOn = true;
+    }
+    
+    private void updateFlashOff(Intent intent) {
+    	final Parameters p = camera.getParameters();
+    	Log.d(TAG,"Turning Off the Flash");
+		p.setFlashMode(Parameters.FLASH_MODE_OFF);
+		camera.setParameters(p);
+		isFlashOn = false;
     }
     
     private void updateStreaming(Intent intent) {
