@@ -43,6 +43,8 @@ public class CamTestActivity extends Activity {
 	Activity act;
 	Context ctx;
 	private Intent intent;
+	private String connectedPeerId;
+	private String data;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +88,10 @@ public class CamTestActivity extends Activity {
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            updateCapture(intent);       
+            connectedPeerId = intent.getStringExtra("connectedPeerId");
+            data = intent.getStringExtra("data");
+        	updateCapture(intent);
+            
         }
     };   
     
@@ -156,6 +161,10 @@ public class CamTestActivity extends Activity {
 				outStream.close();
 				Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length);
 				MediaStore.Images.Media.insertImage(getContentResolver(), fileName, "IMG_"+ timeStamp + ".jpg", "");
+				//Sending to Gear
+				SASmartViewProviderImpl.getInstance().pullDownscaledImg(fileName, 320, 320);
+				SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 123, "IMG_"+ timeStamp + ".jpg", data.length, 320, 320);
+				
 				resetCam();
 
 			} catch (FileNotFoundException e) {

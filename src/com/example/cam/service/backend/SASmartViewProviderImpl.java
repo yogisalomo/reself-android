@@ -300,7 +300,8 @@ public class SASmartViewProviderImpl extends SAAgent {
 
     private void sendCapture(String connectedPeerId, String data) {
     	//
-        intent.putExtra("fire", "fire");
+        intent.putExtra("connectedPeerId", connectedPeerId);
+        intent.putExtra("data", data);
         sendBroadcast(intent);
 	}
 
@@ -508,7 +509,7 @@ public class SASmartViewProviderImpl extends SAAgent {
      * @param width
      * @param height
      */
-    private void pullDownscaledImg(String path, int width, int height) {
+    public void pullDownscaledImg(String path, int width, int height) {
         Log.d(TAG, "pullDownscaledImg :Enter");
 
         // micro thumbnails
@@ -641,7 +642,7 @@ public class SASmartViewProviderImpl extends SAAgent {
      * @param orgWidth
      * @param orgHeight
      */
-    private void sendImgRsp(String connectedPeerId, long id, String orgName, long orgSize, int orgWidth, int orgHeight) {
+    public void sendImgRsp(String connectedPeerId, long id, String orgName, long orgSize, int orgWidth, int orgHeight) {
 
         Log.d(TAG, "sendImgRsp : enter");
         final TBModelJson msg = new TBModelJson(id, orgName, mImgData, orgSize, orgWidth,
