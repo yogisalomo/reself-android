@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <LinearLayout
+<!--         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >"
 			<LinearLayout
@@ -31,7 +31,21 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="Click" />
-        </LinearLayout>
+            
+        </LinearLayout> -->
+        
+        <TextView
+            	android:id="@+id/tap_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:text="Tap your gear to take a picture"
+                android:textAlignment="center"
+                android:textSize="25dp"
+                android:textColor="@color/reselfs"
+                android:shadowColor="#000000"
+                />
+        
     </FrameLayout>
 
 </LinearLayout>

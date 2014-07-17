@@ -14,8 +14,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Typeface;
 import android.hardware.Camera;
-import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
@@ -23,14 +23,12 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.example.cam.service.backend.SASmartViewProviderImpl;
 
@@ -54,35 +52,37 @@ public class CamTestActivity extends Activity {
 		 intent = new Intent(this, SASmartViewProviderImpl.class);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 		setContentView(R.layout.main);
+		
+		TextView tapgear = (TextView) findViewById(R.id.tap_text);
+		tapgear.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/CODE-Bold.otf"));
 		
 		preview = new Preview(this, (SurfaceView)findViewById(R.id.surfaceView));
 		preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		((FrameLayout) findViewById(R.id.camera_preview)).addView(preview);
 		preview.setKeepScreenOn(true);
 		
-		buttonClick = (Button) findViewById(R.id.buttonClick);
+		//buttonClick = (Button) findViewById(R.id.buttonClick);
 		
-		buttonClick.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				//				preview.camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-				camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-			}
-		});
-		
-		buttonClick.setOnLongClickListener(new OnLongClickListener(){
-			@Override
-			public boolean onLongClick(View arg0) {
-				camera.autoFocus(new AutoFocusCallback(){
-					@Override
-					public void onAutoFocus(boolean arg0, Camera arg1) {
-						//camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-					}
-				});
-				return true;
-			}
-		});
+//		buttonClick.setOnClickListener(new OnClickListener() {
+//			public void onClick(View v) {
+//				//				preview.camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+//				camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+//			}
+//		});
+//		
+//		buttonClick.setOnLongClickListener(new OnLongClickListener(){
+//			@Override
+//			public boolean onLongClick(View arg0) {
+//				camera.autoFocus(new AutoFocusCallback(){
+//					@Override
+//					public void onAutoFocus(boolean arg0, Camera arg1) {
+//						//camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+//					}
+//				});
+//				return true;
+//			}
+//		});
 	}
 	
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
