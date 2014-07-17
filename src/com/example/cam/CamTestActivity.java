@@ -61,7 +61,9 @@ public class CamTestActivity extends Activity {
 	private boolean isFlashOn = false;
 	private String eventName;
 	boolean inProcessing = false;
-	byte[] preFrame = new byte[1024*1024*8];
+	boolean activeStreaming = false;
+//	byte[] preFrame = new byte[1024*1024*8];
+	byte[] imgframebyte = new byte[1024*1024*13];
 
 
 	@Override
@@ -134,6 +136,7 @@ public class CamTestActivity extends Activity {
             if (eventName.equals("capture")) {
                 updateCapture(intent);
             } else if (eventName.equals("streaming")){
+                Log.d(TAG, "Akan Masuk Streaming");
                 updateStreaming(intent);
             } else if (eventName.equals("flashOn")){
                 updateFlashOn(intent);
@@ -165,8 +168,10 @@ public class CamTestActivity extends Activity {
     }
     
     private void updateStreaming(Intent intent) {
-        YuvImage newImage = new YuvImage(preFrame, ImageFormat.JPEG, 320, 320, null);
-        SASmartViewProviderImpl.getInstance().sendResponseImg(connectedPeerId, newImage.getYuvData());
+        Log.d(TAG, "Masuk Streaming");
+        activeStreaming = true;
+//        YuvImage newImage = new YuvImage(preFrame, ImageFormat.JPEG, 320, 320, null);
+//        SASmartViewProviderImpl.getInstance().sendResponseImg(connectedPeerId, newImage.getYuvData());
     }
 
 	@Override
@@ -185,28 +190,34 @@ public class CamTestActivity extends Activity {
         public void onPreviewFrame(byte[] frame, Camera c) {
         	//Log.d("test","hello");
             if ( !inProcessing ) {
-                inProcessing = true;
                 
-                int picWidth = 320;
-                int picHeight = 320; 
-                ByteBuffer bbuffer = ByteBuffer.wrap(frame); 
-                bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
+                
+//                int picWidth = 320;
+//                int picHeight = 320; 
+//                ByteBuffer bbuffer = ByteBuffer.wrap(frame); 
+//                bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
                 //Log.d("test","hello");
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                 // Send to Gear
-                Camera.Parameters parameters = camera.getParameters();
-                int width = parameters.getPreviewSize().width;
-                int height = parameters.getPreviewSize().height;
-                YuvImage image = new YuvImage(frame, parameters.getPreviewFormat(),
-                		width, height, null);
-                ByteArrayOutputStream oS = new ByteArrayOutputStream();
-                image.compressToJpeg(
-                        new Rect(0, 0, 320, 320), 90,
-                        		oS);
-                byte[] imgframebyte = oS.toByteArray();
-                SASmartViewProviderImpl.getInstance().pullDownPrevImage(imgframebyte, 320, 320);
-				//SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 1, "prev_"+ timeStamp + ".jpg", frame.length, 320, 320);
-                inProcessing = false;
+                if (activeStreaming) {
+                    Log.d(TAG, "Proses Streaming");
+                    inProcessing = true;
+                    Camera.Parameters parameters = camera.getParameters();
+                    int width = parameters.getPreviewSize().width;
+                    int height = parameters.getPreviewSize().height;
+                    YuvImage image = new YuvImage(frame, parameters.getPreviewFormat(),
+                    		width, height, null);
+                    ByteArrayOutputStream oS = new ByteArrayOutputStream();
+                    image.compressToJpeg(
+                            new Rect(0, 0, width, height), 90,
+                            		oS);
+                    imgframebyte = oS.toByteArray();
+                    SASmartViewProviderImpl.getInstance().pullDownPrevImage(imgframebyte, 320, 320);
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    SASmartViewProviderImpl.getInstance().sendImgRsp(connectedPeerId, 1, "prev_"+ timeStamp + ".jpg", imgframebyte.length, 320, 320);
+                    inProcessing = false;
+                    activeStreaming = false;
+                }
             }
         }
     };
