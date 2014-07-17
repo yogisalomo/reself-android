@@ -300,7 +300,8 @@ public class SASmartViewProviderImpl extends SAAgent {
 
     private void sendCapture(String connectedPeerId, String data) {
     	//
-        intent.putExtra("fire", "fire");
+        intent.putExtra("connectedPeerId", connectedPeerId);
+        intent.putExtra("data", data);
         sendBroadcast(intent);
 	}
 
