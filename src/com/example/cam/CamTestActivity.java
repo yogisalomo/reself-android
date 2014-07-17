@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
@@ -97,6 +98,8 @@ public class CamTestActivity extends Activity {
 		camera = Camera.open();
 		camera.startPreview();
 		preview.setCamera(camera);
+		startService(intent);
+		registerReceiver(broadcastReceiver, new IntentFilter(SASmartViewProviderImpl.BROADCAST_ACTION));
 	}
 
 	@Override
@@ -108,6 +111,8 @@ public class CamTestActivity extends Activity {
 			camera = null;
 		}
 		super.onPause();
+		unregisterReceiver(broadcastReceiver);
+        stopService(intent);        
 	}
 
 	private void resetCam() {

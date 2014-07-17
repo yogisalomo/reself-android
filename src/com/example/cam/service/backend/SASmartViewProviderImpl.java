@@ -69,7 +69,7 @@ import com.samsung.android.sdk.accessory.SASocket;
 
 public class SASmartViewProviderImpl extends SAAgent {
     public static final String TAG = "SmartViewProviderService";
-
+    public static final String BROADCAST_ACTION = "com.example.cam.displayevent";
     public static final int INITIAL_IMAGE_INDEX = -1;
     public static final int REASON_OK = 0;
     // public static final int SERVICE_CONNECTION_RESULT_OK = 0;
@@ -141,7 +141,7 @@ public class SASmartViewProviderImpl extends SAAgent {
         super.onCreate();
         Log.i(TAG, "onCreate of smart view Provider Service");
         instance = this;
-        intent = new Intent("com.example.cam.brodcast.captureevent");
+        intent = new Intent(BROADCAST_ACTION);
         mAccessory = new SA();
         try {
         	mAccessory.initialize(this);
