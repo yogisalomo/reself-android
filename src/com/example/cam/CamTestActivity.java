@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class CamTestActivity extends Activity {
 	private static final String TAG = "CamTestActivity";
 	Preview preview;
 	Button buttonClick;
+	Button flashClick;
 	Camera camera;
 	String fileName;
 	Activity act;
@@ -45,6 +47,7 @@ public class CamTestActivity extends Activity {
 	private Intent intent;
 	private String connectedPeerId;
 	private String data;
+	private boolean isFlashOn = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,11 +66,30 @@ public class CamTestActivity extends Activity {
 		preview.setKeepScreenOn(true);
 		
 		buttonClick = (Button) findViewById(R.id.buttonClick);
+		flashClick = (Button) findViewById(R.id.buttonFlashlight);
 		
 		buttonClick.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				//				preview.camera.takePicture(shutterCallback, rawCallback, jpegCallback);
 				camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+			}
+		});
+		
+		flashClick.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				final Parameters p = camera.getParameters();
+				if(isFlashOn){
+					Log.d(TAG,"Turning Off the Flash");
+					p.setFlashMode(Parameters.FLASH_MODE_OFF);
+					camera.setParameters(p);
+					isFlashOn = false;
+				}
+				else{
+					Log.d(TAG,"Turning On the Flash");
+					p.setFlashMode(Parameters.FLASH_MODE_ON);
+					camera.setParameters(p);
+					isFlashOn = true;
+				}
 			}
 		});
 		
