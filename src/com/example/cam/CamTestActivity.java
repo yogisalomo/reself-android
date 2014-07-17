@@ -8,8 +8,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.example.cam.service.backend.SASmartViewProviderImpl;
+
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
@@ -34,12 +38,14 @@ public class CamTestActivity extends Activity {
 	String fileName;
 	Activity act;
 	Context ctx;
+	private Intent intent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		ctx = this;
 		act = this;
+		 intent = new Intent(this, SASmartViewProviderImpl.class);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -72,6 +78,17 @@ public class CamTestActivity extends Activity {
 			}
 		});
 	}
+	
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateCapture(intent);       
+        }
+    };   
+    
+    private void updateCapture(Intent intent) {
+        camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+    }
 
 	@Override
 	protected void onResume() {

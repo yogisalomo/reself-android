@@ -46,6 +46,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -76,9 +77,12 @@ public class SASmartViewProviderImpl extends SAAgent {
     public static final int REASON_IMAGE_ID_INVALID = 2;
     public static final int REASON_EOF_IMAGE = 3;
     public static final int REASON_DATABASE_ERROR = 4;
+    private final Handler handler = new Handler();
     
     public static SASmartViewProviderImpl instance;
     private SA mAccessory;
+    
+    Intent intent;
     
     String[] mProjection = { MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE,
@@ -136,8 +140,8 @@ public class SASmartViewProviderImpl extends SAAgent {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate of smart view Provider Service");
-        
         instance = this;
+        intent = new Intent("com.example.cam.brodcast.captureevent");
         mAccessory = new SA();
         try {
         	mAccessory.initialize(this);
@@ -296,6 +300,8 @@ public class SASmartViewProviderImpl extends SAAgent {
 
     private void sendCapture(String connectedPeerId, String data) {
     	//
+        intent.putExtra("fire", "fire");
+        sendBroadcast(intent);
 	}
 
 	/**
